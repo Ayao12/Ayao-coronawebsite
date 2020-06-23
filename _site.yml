@@ -1,5 +1,5 @@
 name: "Ayao Nomenyo"
-output_dir: "."
+output_dir: "public"
 navbar:
   title: "Evolution de Coronarirus en Afrique"
   left:
