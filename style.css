@@ -1,0 +1,41 @@
+img {
+  width: 400px;
+  display: block;
+  margin: 0 auto;
+}
+
+.navbar {
+  background-color:#FFA500;
+  border-color:black;
+  font-weight: bold;
+}
+.body {
+  background-color: teal;
+  color: black;
+}
+.navbar-brand {
+color:black!important;
+}
+.navbar-fixed-top{
+position:sticky
+}
+
+#hid{
+  text-decoration: underline;
+  margin:10px auto;
+}
+
+#p1{
+  margin:10px auto;
+  width:80%;
+  padding: 15px;
+  font-size: 16px;
+  font-family: Verdana, cursive, Sans-Serif;
+}
+
+#ct{
+  margin:10px auto;
+  width:80%;
+  padding: 15px;
+  font-family: Verdana, cursive, Sans-Serif;
+}

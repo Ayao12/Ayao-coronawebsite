@@ -1,0 +1,390 @@
+---
+title: "COVID-19 in Africa"
+author: Ayao Nomenyo
+output: 
+  flexdashboard::flex_dashboard:
+    #source_code: embed
+    orientation: rows
+    vertical_layout: scroll
+    theme: journal
+    social: [ "twitter", "menu" ]
+    highlight: zenburn
+---
+
+<link rel="stylesheet" href="style.css">
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+#library(coronavirus)
+library(highcharter)
+library(tidyverse)
+library(tidyselect)
+```
+
+
+
+
+```{r global, include=FALSE}
+covidAfrica <- readRDS("D:/DOSSIERS-NOMEY/Mes-Travaux-R/Datasets/covidAfrica.RDS")
+```
+
+```{r latest, include=FALSE}
+corona_latest <- covidAfrica %>% 
+filter(date %in% max(covidAfrica$date))
+```
+
+
+
+Sommaire
+=======================================================================
+
+Row {.bg-secondary}
+-----------------------------------------------------------------------
+
+```{r}
+total_cases <- sum(corona_latest$confirmed)
+```
+
+### `r paste0("Total des Cas confirmés : ", max(covidAfrica$date))` 
+
+```{r}
+confirmed <- sum(corona_latest$confirmed) #computeContactRate()
+valueBox(prettyNum(confirmed, big.mark = ","), icon = "fa-users")
+```
+
+
+###  Rétablis {.bg-primary}
+
+```{r}
+recovered <- sum(corona_latest$recovered)  #computeAverageRating()
+gauge(recovered, min = 0, max = sum(corona_latest$confirmed), abbreviate = FALSE,  gaugeSectors(
+ success = c(80, 100), warning = c(40, 79), danger = c(0, 39)
+ ))
+```
+
+
+### Décès {.bg-primary}
+
+```{r}
+deaths <- sum(corona_latest$death) # computeCancellations()
+gauge(deaths, min = 0, max = sum(corona_latest$confirmed), abbreviate = FALSE, gaugeSectors(
+ success = c(80, 100), warning = c(40, 79), danger = c(0, 39)
+ ))
+```
+
+Introduction
+-----------------------------------------------------------------------
+<center id ="ct"> 
+    <h2 id= "hid">CORONAVIRUS (COVID-19) EN AFRIQUE </h2>
+    <br>
+    <p>
+    Depuis Décembre 2019, le monde est sous la menace d'un virus appelé <strong>Coronavirus (COVID-19)</strong> faisant près de 500 000 morts à nos jours dont l'Amérique, l'Europe et l'Asie sont les continents les plus touchés: 120 688 décès aux Etats-Unis, 47 869 au Brésil, 42 288 au Royaume-Unis, 34 514 en Italie ... Les grands organismes ont imaginé le pire pour l'Afrique, car, faute de moyens. Mais de nos jours, les prévisions faites sur l'Afrique concernant cette pandémie semblent échouer. L'Afrique, est-elle épargnée? Quelle est la situation exacte dans nos pays africains sur <strong>COVID-19</strong>?  Sur cette page, nous donnons la possibilité de suivre l'évolution de cette pandémie en Afrique.
+    </p> 
+</center>
+
+
+Afrique
+======================================================================
+
+Pays
+-----------------------------------------------------------------------
+```{r}
+
+data(worldgeojson, package = "highcharter")
+africa_map <- readRDS("D:/DOSSIERS-NOMEY/Mes-Travaux-R/Datasets/africa_map_data.RDS")
+
+corona_latest %>% 
+  janitor::clean_names()  %>%
+  group_by(country) %>% 
+ summarise(total_confirmed = sum(confirmed, na.rm = TRUE)) %>% 
+ filter(total_confirmed > 0) %>%
+  mutate(log_total_confirmed = log(total_confirmed)) -> countries
+
+highchart() %>%
+  hc_add_series_map(worldgeojson, countries, value = 'log_total_confirmed', joinBy = c('name','country'))  %>% 
+  hc_colors(c("darkorange", "darkgray")) %>% 
+  hc_colorAxis(stops = color_stops()) %>% 
+  hc_title(text = "Les Pays exposés au COVID19 en AFRIQUE") %>% 
+  hc_subtitle(text = 'Avec les cas confirmés') 
+```
+
+Row 
+-----------------------------------------------------------------------
+
+Region
+=======================================================================
+
+Column
+-----------------------------------------------------------------------
+
+### `r paste0("Pays par cas confirmés : ", max(covidAfrica$date))` 
+
+```{r}
+corona_latest %>% 
+#  filter(!country %in% 'Others') %>% 
+  group_by(country) %>% 
+  summarise(total_confirmed = sum(confirmed)) %>% 
+  arrange(desc(total_confirmed)) %>% 
+  head(10) %>% 
+  hchart("bar", hcaes(x = country,  y =total_confirmed)) %>%
+  hc_yAxis(title = list(text = "Cas confirmés"))%>%
+  hc_xAxis(title = list(text = "Les dix premiers pays"))%>%
+  hc_add_theme(hc_theme_smpl())
+```
+
+
+Column
+-----------------------------------------------------------------------```
+
+### `r paste0("Regions par les cas confimés : ", max(covidAfrica$date))`
+
+```{r}
+corona_latest %>% 
+# filter(! subregion %in% 'Others') %>% 
+  group_by(subregion) %>% 
+  summarise(total_confirmed = sum(confirmed)) %>% 
+  arrange(desc(total_confirmed)) %>% 
+  head(10) %>% 
+  hchart("bar",hcaes(x = subregion,  y =total_confirmed)) %>%
+  hc_yAxis(title = list(text = "Cas Confirmés"))%>%
+  hc_xAxis(title = list(text = "Les Sous Regions"))%>%
+  hc_add_theme(hc_theme_smpl())
+``` 
+
+
+Row 
+-----------------------------------------------------------------------
+
+Tendance {.tabset .tabset-fade}
+===============
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+### Par  cas confirmés
+
+```{r}
+covidAfrica %>% 
+  group_by(date) %>% 
+  summarise(total_count = max(confirmed)) %>% 
+  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hc_title(text = "Tendance de COVID19 des cas confirmés") %>% 
+  hc_xAxis(title = list(text = "date"))%>%
+  hc_yAxis(title = list(text = "Evolution des cas confirmés"))%>%
+  hc_add_theme(hc_theme_538())
+```
+
+
+### Par Récupération
+
+```{r}
+covidAfrica %>% 
+  group_by(date) %>% 
+  summarise(total_count = max(recovered)) %>% 
+  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hc_title(text = "Tendance de COVID19 des rétablis") %>% 
+  hc_yAxis(title = list(text = "Evolution des cas rétablis"))%>%
+  hc_add_theme(hc_theme_538())
+```
+
+### Par Décès
+
+```{r}
+covidAfrica %>% 
+  group_by(date) %>% 
+  summarise(total_count = max(death)) %>% 
+  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hc_title(text = "Tendance du nombre de décès du COVID") %>% 
+  hc_xAxis(title = list(text = "date"))%>%
+  hc_yAxis(title = list(text = "Evolution du nombre de décès"))%>%
+  hc_add_theme(hc_theme_538())
+```
+
+Row 
+-----------------------------------------------------------------------
+
+COVID19 au Togo {.tabset .tabset-fade}
+===============
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+
+### Evolution des cas confirmés au Togo
+
+```{r}
+covidAfrica %>% 
+  filter(country %in% "Togo")%>%
+  group_by(date) %>% 
+  summarise(total_count = max(confirmed)) %>% 
+  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hc_title(text = "Tendance de COVID19 des cas confirmés au Togo") %>% 
+  hc_xAxis(title = list(text = "date"))%>%
+  hc_yAxis(title = list(text = "Evolution des cas confirmés"))%>%
+  hc_add_theme(hc_theme_538())
+```
+
+
+### Evolution des cas retablis au Togo
+
+```{r}
+covidAfrica %>%
+  filter(country %in% "Togo")%>%
+  group_by(date) %>% 
+  summarise(total_count = max(recovered)) %>% 
+  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hc_title(text = "Tendance de COVID19 des rétablis au Togo") %>% 
+  hc_yAxis(title = list(text = "Evolution des cas rétablis"))%>%
+  hc_add_theme(hc_theme_538())
+```
+
+### Evolution du nombre de décès
+
+```{r}
+covidAfrica %>% 
+  filter(country %in% "Togo")%>%
+  group_by(date) %>% 
+  summarise(total_count = max(death)) %>% 
+  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hc_title(text = "Tendance du nombre de décès du COVID") %>% 
+  hc_xAxis(title = list(text = "date"))%>%
+  hc_yAxis(title = list(text = "Evolution du nombre de décès"))%>%
+  hc_add_theme(hc_theme_538())
+```
+
+Row 
+-----------------------------------------------------------------------
+
+COVID19 au Cameroun {.tabset .tabset-fade}
+===============
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+
+### Evolution des cas confirmés au Cameroon
+
+```{r}
+covidAfrica %>% 
+  filter(country %in% "Cameroon")%>%
+  group_by(date) %>% 
+  summarise(total_count = max(confirmed)) %>% 
+  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hc_title(text = "Tendance de COVID19 des cas confirmés au Cameroon") %>% 
+  hc_xAxis(title = list(text = "date"))%>%
+  hc_yAxis(title = list(text = "Evolution des cas confirmés"))%>%
+  hc_add_theme(hc_theme_538())
+```
+
+
+### Evolution des cas retablis au Cameroon
+
+```{r}
+covidAfrica %>%
+  filter(country %in% "Cameroon")%>%
+  group_by(date) %>% 
+  summarise(total_count = max(recovered)) %>% 
+  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hc_title(text = "Tendance de COVID19 des rétablis au Cameroon") %>% 
+  hc_yAxis(title = list(text = "Evolution des cas rétablis"))%>%
+  hc_add_theme(hc_theme_538())
+```
+
+### Evolution du nombre de décès
+
+```{r}
+covidAfrica %>% 
+  filter(country %in% "Cameroon")%>%
+  group_by(date) %>% 
+  summarise(total_count = max(death)) %>% 
+  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hc_title(text = "Tendance du nombre de décès du COVID") %>% 
+  hc_xAxis(title = list(text = "date"))%>%
+  hc_yAxis(title = list(text = "Evolution du nombre de décès"))%>%
+  hc_add_theme(hc_theme_538())
+```
+
+
+Row 
+-----------------------------------------------------------------------
+
+Carte
+====================
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### `r paste0("Par confirmés : ", max(covidAfrica$date))`
+
+```{r}
+corona_latest %>% 
+  janitor::clean_names() %>% 
+  group_by(country) %>% 
+  summarise(total_confirmed = sum(confirmed)) %>% 
+  filter(total_confirmed > 0) -> countries #> %>% 
+# mutate(log_total_confirmed = log(total_confirmed)) 
+
+highchart() %>%
+  hc_add_series_map(africa_map, countries, value = 'total_confirmed', joinBy = c('name','country'))  %>% 
+  #hc_colors(c("darkorange", "darkgray")) %>% 
+  hc_colorAxis(stops = color_stops()) %>% 
+  hc_title(text = "Pays exposés au COVID19") %>% 
+  hc_subtitle(text = 'Avec total confirmé - chiffres réels')
+```
+
+### `r paste0("Par rétablis :", max(as.Date(covidAfrica$date)))`
+
+```{r}
+
+
+data(worldgeojson, package = "highcharter")
+
+corona_latest %>% 
+  janitor::clean_names() %>% 
+  group_by(country) %>% 
+  summarise(total_recovered = sum(recovered)) %>% 
+ filter(total_recovered > 0)  -> countries
+
+highchart() %>%
+  hc_add_series_map(africa_map, countries, value = 'total_recovered', joinBy = c('name','country'))  %>% 
+  #hc_colors(c("darkorange", "darkgray")) %>% 
+  hc_colorAxis(stops = color_stops()) %>% 
+  hc_title(text = "Pays exposés au COVID19") %>% 
+  hc_subtitle(text = 'Avec total rétabli - chiffres réels')
+```
+
+### `r paste0("Par décès : ", max(covidAfrica$date))`
+
+
+```{r}
+
+
+data(worldgeojson, package = "highcharter")
+
+
+corona_latest %>% 
+  janitor::clean_names() %>% 
+  group_by(country) %>% 
+  summarise(total_deaths = sum(death)) %>% 
+  filter(total_deaths > 0)  -> countries
+
+highchart() %>%
+  hc_add_series_map(africa_map, countries, value = 'total_deaths', joinBy = c('name','country'))  %>% 
+  #hc_colors(c("darkorange", "darkgray")) %>% 
+  hc_colorAxis(stops = color_stops()) %>% 
+  hc_title(text = "Pays exposés au COVID19") %>% 
+  hc_subtitle(text = 'Avec total décès - chiffres réels')
+```
+
+Row
+-----------------------------------------------------------------------
+
+Liens et contact
+====================
+
++ [Coronavirus COVID-19 Global Cases by Johns Hopkins CSSE](https://www.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6)
++ [Coronavirus disease (COVID-19) outbreak - WHO](https://www.who.int/emergencies/diseases/novel-coronavirus-2019)
++ [coronavirus R package provides a tidy format dataset](https://github.com/RamiKrispin/coronavirus)
++ [COVID-19 Interactive Dashboard](https://www.kaggle.com/barun2104/covid-19-interactive-dashboard)
++[Data sets coronavirus](https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset/kernels)
+
+<br> <br>
+
+<center>
+    <a href="mailto:ayao.nomenyo@gmail.com"> Ecrivez-nous <a>
+<center>

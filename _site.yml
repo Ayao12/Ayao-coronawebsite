@@ -1,0 +1,15 @@
+name: "Ayao Nomenyo"
+output_dir: "."
+navbar:
+  title: "Evolution de Coronarirus en Afrique"
+  left:
+    - text: ""
+      href: index.html
+#    - text: "Projects"     ##### the new
+#     href: projects.html  ##### stuff
+#    - text: "About Me"
+#      href: about.html
+output:
+  html_document:
+    theme: flatly
+    css: style.css
