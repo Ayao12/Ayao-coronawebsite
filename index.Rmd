@@ -25,7 +25,7 @@ library(tidyselect)
 
 
 ```{r global, include=FALSE}
-covidAfrica <- readRDS("D:/DOSSIERS-NOMEY/Mes-Travaux-R/Datasets/covidAfrica.RDS")
+covidAfrica <- readRDS("covidAfrica.RDS")
 ```
 
 ```{r latest, include=FALSE}
@@ -91,7 +91,7 @@ Pays
 ```{r}
 
 data(worldgeojson, package = "highcharter")
-africa_map <- readRDS("D:/DOSSIERS-NOMEY/Mes-Travaux-R/Datasets/africa_map_data.RDS")
+africa_map <- readRDS("africa_map_data.RDS")
 
 corona_latest %>% 
   janitor::clean_names()  %>%
@@ -381,10 +381,10 @@ Liens et contact
 + [Coronavirus disease (COVID-19) outbreak - WHO](https://www.who.int/emergencies/diseases/novel-coronavirus-2019)
 + [coronavirus R package provides a tidy format dataset](https://github.com/RamiKrispin/coronavirus)
 + [COVID-19 Interactive Dashboard](https://www.kaggle.com/barun2104/covid-19-interactive-dashboard)
-+[Data sets coronavirus](https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset/kernels)
++ [Data sets coronavirus](https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset/kernels)
 
 <br> <br>
 
 <center>
-    <a href="mailto:ayao.nomenyo@gmail.com"> Ecrivez-nous <a>
+    <a href="mailto:ayao.nomenyo12@gmail.com"> Ecrivez-nous <a>
 <center>
