@@ -101,7 +101,7 @@ corona_latest %>%
   mutate(log_total_confirmed = log(total_confirmed)) -> countries
 
 highchart() %>%
-  hc_add_series_map(worldgeojson, countries, value = 'log_total_confirmed', joinBy = c('name','country'))  %>% 
+  hc_add_series_map(africa_map, countries, value = 'log_total_confirmed', joinBy = c('name','country'))  %>% 
   hc_colors(c("darkorange", "darkgray")) %>% 
   hc_colorAxis(stops = color_stops()) %>% 
   hc_title(text = "Les Pays exposés au COVID19 en AFRIQUE") %>% 
