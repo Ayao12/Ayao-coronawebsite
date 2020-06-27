@@ -1,6 +1,6 @@
 ---
 title: "COVID-19 in Africa"
-author: Ayao Nomenyo
+author: 
 output: 
   flexdashboard::flex_dashboard:
     #source_code: embed
@@ -25,7 +25,7 @@ library(tidyselect)
 
 
 ```{r global, include=FALSE}
-covidAfrica <- readRDS("covidAfrica.RDS")
+covidAfrica <- readRDS("D:/DOSSIERS-NOMEY/Mes-Travaux-R/Datasets/covidAfrica.RDS")
 ```
 
 ```{r latest, include=FALSE}
@@ -91,7 +91,7 @@ Pays
 ```{r}
 
 data(worldgeojson, package = "highcharter")
-africa_map <- readRDS("africa_map_data.RDS")
+africa_map <- readRDS("D:/DOSSIERS-NOMEY/Mes-Travaux-R/Datasets/africa_map_data.RDS")
 
 corona_latest %>% 
   janitor::clean_names()  %>%
@@ -101,11 +101,15 @@ corona_latest %>%
   mutate(log_total_confirmed = log(total_confirmed)) -> countries
 
 highchart() %>%
-  hc_add_series_map(africa_map, countries, value = 'log_total_confirmed', joinBy = c('name','country'))  %>% 
+  hc_add_series_map(africa_map, countries, 
+                    value = 'log_total_confirmed',
+                    name = "Coronavirus, Nouveau cas",
+                    joinBy = c('name','country'))  %>%
+  hc_mapNavigation(enabled = TRUE) %>%
   hc_colors(c("darkorange", "darkgray")) %>% 
   hc_colorAxis(stops = color_stops()) %>% 
   hc_title(text = "Les Pays exposés au COVID19 en AFRIQUE") %>% 
-  hc_subtitle(text = 'Avec les cas confirmés') 
+  hc_subtitle(text = 'Avec le log du nombre de cas confirmé') 
 ```
 
 Row 
@@ -152,69 +156,79 @@ corona_latest %>%
 ``` 
 
 
-Row 
------------------------------------------------------------------------
+Tendance 
+=======================================================================
 
-Tendance  {.tabset .tabset-fade}
-===============
-Row {.tabset .tabset-fade}
+Column {data-width=650}
 -----------------------------------------------------------------------
 ### Par  cas confirmés
 
 ```{r}
 covidAfrica %>% 
+  filter(date >= as.Date("2020-03-01"))%>%
   group_by(date) %>% 
   summarise(total_count = max(confirmed)) %>% 
-  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hchart("line",hcaes(x = date, y = total_count),
+         name = "Le nombre de cas confirmé") %>% 
   hc_title(text = "Tendance de COVID19 des cas confirmés") %>% 
   hc_xAxis(title = list(text = "date"))%>%
   hc_yAxis(title = list(text = "Evolution des cas confirmés"))%>%
   hc_add_theme(hc_theme_538())
 ```
 
+Column {data-width=350}
+-----------------------------------------------------------------------
 
 ### Par Récupération
 
 ```{r}
-covidAfrica %>% 
+covidAfrica %>%
+  filter(date >= as.Date("2020-03-01"))%>%
   group_by(date) %>% 
   summarise(total_count = max(recovered)) %>% 
-  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hchart("line",hcaes(x = date, y = total_count),
+         name = "Le nombre de cas retabli") %>% 
   hc_title(text = "Tendance de COVID19 des rétablis") %>% 
   hc_yAxis(title = list(text = "Evolution des cas rétablis"))%>%
   hc_add_theme(hc_theme_538())
 ```
 
+Column {data-width=350}
+-----------------------------------------------------------------------
+
 ### Par Décès
 
 ```{r}
-covidAfrica %>% 
+covidAfrica %>%
+  filter(date >= as.Date("2020-03-01"))%>%
   group_by(date) %>% 
   summarise(total_count = max(death)) %>% 
-  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hchart("line",hcaes(x = date, y = total_count),
+         name = "Le nombre de cas décès") %>% 
   hc_title(text = "Tendance du nombre de décès du COVID") %>% 
   hc_xAxis(title = list(text = "date"))%>%
   hc_yAxis(title = list(text = "Evolution du nombre de décès"))%>%
   hc_add_theme(hc_theme_538())
 ```
 
-Row 
------------------------------------------------------------------------
+
 
 COVID19 au Togo {.tabset .tabset-fade}
 ===============
-Row {.tabset .tabset-fade}
+Column {data-width=350}
 -----------------------------------------------------------------------
 
 
 ### Evolution des cas confirmés au Togo
 
 ```{r}
-covidAfrica %>% 
+covidAfrica %>%
+  filter(date >= as.Date("2020-03-01"))%>%
   filter(country %in% "Togo")%>%
   group_by(date) %>% 
   summarise(total_count = max(confirmed)) %>% 
-  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hchart("line",hcaes(x = date, y = total_count),
+         name = "Le nombre de cas confirmé") %>% 
   hc_title(text = "Tendance de COVID19 des cas confirmés au Togo") %>% 
   hc_xAxis(title = list(text = "date"))%>%
   hc_yAxis(title = list(text = "Evolution des cas confirmés"))%>%
@@ -222,78 +236,98 @@ covidAfrica %>%
 ```
 
 
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+
 ### Evolution des cas retablis au Togo
 
 ```{r}
 covidAfrica %>%
+  filter(date >= as.Date("2020-03-01"))%>%
   filter(country %in% "Togo")%>%
   group_by(date) %>% 
   summarise(total_count = max(recovered)) %>% 
-  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hchart("line",hcaes(x = date, y = total_count),
+         name = "Le nombre de cas retabli") %>% 
   hc_title(text = "Tendance de COVID19 des rétablis au Togo") %>% 
   hc_yAxis(title = list(text = "Evolution des cas rétablis"))%>%
   hc_add_theme(hc_theme_538())
 ```
 
+Column {data-width=350}
+-----------------------------------------------------------------------
+
 ### Evolution du nombre de décès
 
 ```{r}
-covidAfrica %>% 
+covidAfrica %>%
+  filter(date >= as.Date("2020-03-01"))%>%
   filter(country %in% "Togo")%>%
   group_by(date) %>% 
   summarise(total_count = max(death)) %>% 
-  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hchart("line",hcaes(x = date, y = total_count),
+         name = "Le nombre de cas décès") %>% 
   hc_title(text = "Tendance du nombre de décès du COVID") %>% 
   hc_xAxis(title = list(text = "date"))%>%
   hc_yAxis(title = list(text = "Evolution du nombre de décès"))%>%
   hc_add_theme(hc_theme_538())
 ```
 
-Row 
------------------------------------------------------------------------
 
 COVID19 au Cameroun {.tabset .tabset-fade}
 ===============
-Row {.tabset .tabset-fade}
+Column {data-width=350}
 -----------------------------------------------------------------------
 
 
 ### Evolution des cas confirmés au Cameroon
 
 ```{r}
-covidAfrica %>% 
+covidAfrica %>%
+  filter(date >= as.Date("2020-03-01"))%>%
   filter(country %in% "Cameroon")%>%
   group_by(date) %>% 
   summarise(total_count = max(confirmed)) %>% 
-  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hchart("line",hcaes(x = date, y = total_count),
+         name = "Le nombre de cas confirmé") %>% 
   hc_title(text = "Tendance de COVID19 des cas confirmés au Cameroon") %>% 
   hc_xAxis(title = list(text = "date"))%>%
   hc_yAxis(title = list(text = "Evolution des cas confirmés"))%>%
   hc_add_theme(hc_theme_538())
 ```
 
+Column {data-width=350}
+-----------------------------------------------------------------------
 
 ### Evolution des cas retablis au Cameroon
 
 ```{r}
 covidAfrica %>%
+  filter(date >= as.Date("2020-03-01"))%>%
   filter(country %in% "Cameroon")%>%
   group_by(date) %>% 
   summarise(total_count = max(recovered)) %>% 
-  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hchart("line",hcaes(x = date, y = total_count),
+         name = "Le nombre de cas retabli") %>% 
   hc_title(text = "Tendance de COVID19 des rétablis au Cameroon") %>% 
   hc_yAxis(title = list(text = "Evolution des cas rétablis"))%>%
   hc_add_theme(hc_theme_538())
 ```
 
+Column {data-width=350}
+-----------------------------------------------------------------------
+
 ### Evolution du nombre de décès
 
 ```{r}
-covidAfrica %>% 
+covidAfrica %>%
+  filter(date >= as.Date("2020-03-01"))%>%
   filter(country %in% "Cameroon")%>%
   group_by(date) %>% 
   summarise(total_count = max(death)) %>% 
-  hchart("line",hcaes(x = date, y = total_count)) %>% 
+  hchart("line",hcaes(x = date, y = total_count),
+         name = "Le nombre de cas décès") %>% 
   hc_title(text = "Tendance du nombre de décès du COVID") %>% 
   hc_xAxis(title = list(text = "date"))%>%
   hc_yAxis(title = list(text = "Evolution du nombre de décès"))%>%
@@ -320,9 +354,13 @@ corona_latest %>%
 # mutate(log_total_confirmed = log(total_confirmed)) 
 
 highchart() %>%
-  hc_add_series_map(africa_map, countries, value = 'total_confirmed', joinBy = c('name','country'))  %>% 
+  hc_add_series_map(africa_map, countries,
+                    value = 'total_confirmed', 
+                    name = "Coronavirus, Le nombre de cas confirmé",
+                    joinBy = c('name','country'))  %>% 
   #hc_colors(c("darkorange", "darkgray")) %>% 
-  hc_colorAxis(stops = color_stops()) %>% 
+  hc_colorAxis(stops = color_stops()) %>%
+  hc_mapNavigation(enabled = TRUE) %>%
   hc_title(text = "Pays exposés au COVID19") %>% 
   hc_subtitle(text = 'Avec total confirmé - chiffres réels')
 ```
@@ -341,8 +379,12 @@ corona_latest %>%
  filter(total_recovered > 0)  -> countries
 
 highchart() %>%
-  hc_add_series_map(africa_map, countries, value = 'total_recovered', joinBy = c('name','country'))  %>% 
-  #hc_colors(c("darkorange", "darkgray")) %>% 
+  hc_add_series_map(africa_map, countries,
+                    value = 'total_recovered',
+                    name = "Coronavirus, Le nombre de cas rétabli",
+                    joinBy = c('name','country'))  %>% 
+  #hc_colors(c("darkorange", "darkgray")) %>%
+  hc_mapNavigation(enabled = TRUE) %>%
   hc_colorAxis(stops = color_stops()) %>% 
   hc_title(text = "Pays exposés au COVID19") %>% 
   hc_subtitle(text = 'Avec total rétabli - chiffres réels')
@@ -364,8 +406,12 @@ corona_latest %>%
   filter(total_deaths > 0)  -> countries
 
 highchart() %>%
-  hc_add_series_map(africa_map, countries, value = 'total_deaths', joinBy = c('name','country'))  %>% 
-  #hc_colors(c("darkorange", "darkgray")) %>% 
+  hc_add_series_map(africa_map, countries, 
+                    value = 'total_deaths',
+                    name = "Coronavirus, Nombre de décès",
+                    joinBy = c('name','country'))  %>% 
+  #hc_colors(c("darkorange", "darkgray")) %>%
+  hc_mapNavigation(enabled = TRUE) %>%
   hc_colorAxis(stops = color_stops()) %>% 
   hc_title(text = "Pays exposés au COVID19") %>% 
   hc_subtitle(text = 'Avec total décès - chiffres réels')
@@ -386,5 +432,5 @@ Liens et contact
 <br> <br>
 
 <center>
-    <a href="mailto:ayao.nomenyo12@gmail.com"> Ecrivez-nous <a>
+    <a href="mailto:ayao.nomenyo@gmail.com"> Ecrivez-nous <a>
 <center>
