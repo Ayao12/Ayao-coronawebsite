@@ -86,7 +86,7 @@ Introduction
 Afrique
 ======================================================================
 
-Pays
+Pays 
 -----------------------------------------------------------------------
 ```{r}
 
@@ -130,7 +130,8 @@ corona_latest %>%
   summarise(total_confirmed = sum(confirmed)) %>% 
   arrange(desc(total_confirmed)) %>% 
   head(10) %>% 
-  hchart("bar", hcaes(x = country,  y =total_confirmed)) %>%
+  hchart("bar", hcaes(x = country,  y =total_confirmed),
+          name = "Nombre de cas détecté") %>%
   hc_yAxis(title = list(text = "Cas confirmés"))%>%
   hc_xAxis(title = list(text = "Les dix premiers pays"))%>%
   hc_add_theme(hc_theme_smpl())
@@ -149,7 +150,8 @@ corona_latest %>%
   summarise(total_confirmed = sum(confirmed)) %>% 
   arrange(desc(total_confirmed)) %>% 
   head(10) %>% 
-  hchart("bar",hcaes(x = subregion,  y =total_confirmed)) %>%
+  hchart("bar",hcaes(x = subregion,  y =total_confirmed),
+         name = "Nombre de cas détecté") %>%
   hc_yAxis(title = list(text = "Cas Confirmés"))%>%
   hc_xAxis(title = list(text = "Les Sous Regions"))%>%
   hc_add_theme(hc_theme_smpl())
@@ -176,7 +178,7 @@ covidAfrica %>%
   hc_add_theme(hc_theme_538())
 ```
 
-Column {data-width=350}
+Column {data-height=350}
 -----------------------------------------------------------------------
 
 ### Par Récupération
@@ -193,7 +195,7 @@ covidAfrica %>%
   hc_add_theme(hc_theme_538())
 ```
 
-Column {data-width=350}
+Column {data-height=350}
 -----------------------------------------------------------------------
 
 ### Par Décès
