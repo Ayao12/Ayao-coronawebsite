@@ -15,7 +15,6 @@ output:
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
-#library(coronavirus)
 library(highcharter)
 library(tidyverse)
 library(tidyselect)
