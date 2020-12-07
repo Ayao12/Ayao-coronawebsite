@@ -34,6 +34,7 @@ filter(date %in% max(covidAfrica$date))
 
 
 
+
 Sommaire
 =======================================================================
 
@@ -435,3 +436,9 @@ Liens et contact
 <center>
     <a href="mailto:ayao.nomenyo@gmail.com"> Ecrivez-nous <a>
 <center>
+
+
+Home
+===================================================
+
+<button><a href='https://ayaowebsite.rbind.io/' alt='Broken Link'>Cliquez pour aller dans Home</a></button>
